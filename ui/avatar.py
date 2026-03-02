@@ -1,37 +1,67 @@
 import pygame
-import random
 import os
 
 class JarvisAvatar:
-    def __init__(self, image_path="jarvis_avatar.png"):
-        pygame.init()
-        
+    def __init__(self, base_path="ui/assets/avatar"):
         self.screen = pygame.display.set_mode((300, 300), pygame.NOFRAME | pygame.SRCALPHA)
         
-        try:
-            self.image = pygame.image.load(image_path).convert_alpha()
-        except:
-            self.image = pygame.Surface((200, 200), pygame.SRCALPHA)
-            pygame.draw.circle(self.image, (0, 150, 255, 200), (100, 100), 100)
-            
-        self.image = pygame.transform.scale(self.image, (200, 200))
-        self.rect = self.image.get_rect(center=(150, 150))
+        # Atributos de controle
+        self.current_state = "idle"
         self.is_talking = False
-    
-    def set_talking(self, talking):
-        """Método para o main.py avisar se o Jarvis está falando ou não."""
-        self.is_talking = talking
+        self.frame_index = 0
+        
+        # Carregamento dos Ativos
+        self.assets = {
+            "idle": self._load_frames(f"{base_path}/idle"),
+            "talking": self._load_frames(f"{base_path}/talking"),
+            "listening": self._load_frames(f"{base_path}/listening")
+        }
+
+    def _load_frames(self, path):
+        """Carrega PNGs garantindo transparência."""
+        frames = []
+        if os.path.exists(path):
+            files = sorted([f for f in os.listdir(path) if f.endswith('.png')])
+            for f in files:
+                img = pygame.image.load(os.path.join(path, f)).convert_alpha()
+                frames.append(img)
+        return frames if frames else [pygame.Surface((300, 300), pygame.SRCALPHA)]
+
+    def play_idle(self):
+        """Animação de repouso: respiração suave e piscadas."""
+        self.current_state = "idle"
+        self._animate(speed=0.1) 
+
+    def play_talking(self):
+        """Animação de fala: sincronizada com a saída de áudio."""
+        self.current_state = "talking"
+        self._animate(speed=0.25) 
+
+    def play_listening(self):
+        """Animação de escuta: sinaliza que o microfone está ativo."""
+        self.current_state = "listening"
+        self._animate(speed=0.15)
+
+    def _animate(self, speed):
+        """Lógica interna para girar os frames do estado atual."""
+        frames = self.assets.get(self.current_state)
+        self.frame_index = (self.frame_index + speed) % len(frames)
+        img = frames[int(self.frame_index)]
+        
+        self.screen.fill((0, 0, 0, 0))
+        self.screen.blit(img, (0, 0))
+        pygame.display.flip()
 
     def draw(self):
-        self.screen.fill((0, 0, 0, 0))
-        
+        """O Loop principal decide qual ação executar."""
         if self.is_talking:
-            scale_factor = random.uniform(1.0, 1.15)
-            new_size = (int(200 * scale_factor), int(200 * scale_factor))
-            scaled_image = pygame.transform.scale(self.image, new_size)
-            temp_rect = scaled_image.get_rect(center=(150, 150))
-            self.screen.blit(scaled_image, temp_rect)
+            self.play_talking()
+        elif self.current_state == "listening":
+            self.play_listening()
         else:
-            self.screen.blit(self.image, self.rect)
+            self.play_idle()
 
-        pygame.display.flip()
+    def set_talking(self, state: bool):
+        """Interface para o main.py controlar a fala."""
+        self.is_talking = state
+        if not state: self.frame_index = 0 
