@@ -29,6 +29,6 @@ class MemoryManager:
             if fact:
                 return f"Minha base de dados indica: {fact}"
             return "Não encontrei nenhum registro sobre isso em minha memória, senhor."
+        
 
         return [remember_fact, retrieve_fact]
-    

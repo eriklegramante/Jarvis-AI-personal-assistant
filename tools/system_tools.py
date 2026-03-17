@@ -73,6 +73,12 @@ class SystemManager:
             """Retorna a data e hora atual do sistema."""
             return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         
+        @tool
+        def turn_off():
+            """Desliga o sistema. Use com cautela."""
+            os.system("shutdown /s /t 1") 
+            return "Iniciando protocolo de desligamento. Até a próxima, senhor!"
+
         return [
             get_personal_info, 
             check_disk_space, 
@@ -80,5 +86,6 @@ class SystemManager:
             verify_user_access, 
             list_directory_files, 
             get_system_specs,
-            get_current_datetime
+            get_current_datetime,
+            turn_off
         ]

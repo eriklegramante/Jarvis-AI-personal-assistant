@@ -1,5 +1,0 @@
-Avatar funcionando, porém, fundo transparente não funcionando
-
-Gatilho retirado, bagunçou a logica e a resposta do jarvis não chegava após o gatilho, será implementado mais para frente.
-
-novo avatar baixado, será implementado em breve

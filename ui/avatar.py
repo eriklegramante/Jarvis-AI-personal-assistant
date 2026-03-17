@@ -38,25 +38,19 @@ class JarvisAvatar:
             """Renderiza o frame atual com efeito de pulsação quando fala."""
             self.screen.fill((0, 0, 0, 0)) 
             
-            # 1. Velocidade da animação dos frames
             speed = self.animation_speed * 1.5 if self.is_talking else self.animation_speed
             self.frame_index = (self.frame_index + speed) % len(self.frames)
             img = self.frames[int(self.frame_index)]
             
-            # 2. LÓGICA DE PULSAÇÃO (Reação à fala)
             if self.is_talking:
                 import math
                 import time
                 
-                # Cria uma onda baseada no tempo para o efeito de "respiração/vibração"
-                # Pulsa entre 1.0 e 1.05 (5% de zoom)
                 pulse = 1.0 + (math.sin(time.time() * 15) * 0.05) 
                 
                 new_size = (int(800 * pulse), int(800 * pulse))
-                # Redimensiona o frame atual para dar efeito de zoom
                 img = pygame.transform.smoothscale(img, new_size)
                 
-                # Centraliza o frame maior na tela de 800x800
                 offset_x = (new_size[0] - 800) // 2
                 offset_y = (new_size[1] - 800) // 2
                 self.screen.blit(img, (-offset_x, -offset_y))

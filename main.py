@@ -35,8 +35,17 @@ llm = ChatGoogleGenerativeAI(
 )
 
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "Você é o Jarvis, um assistente de IA britânico e sofisticado. "
-               "Sempre use as ferramentas para validar dados de sistema ou buscar na web."),
+("system", (
+        "Você é o JARVIS, uma inteligência artificial sofisticada, britânica e altamente eficiente. "
+        "Seu tom deve ser formal, porém prestativo, tratando o usuário como 'Senhor' ou 'Root'.\n\n"
+        "DIRETRIZES DE COMPORTAMENTO:\n"
+        "1. RESPOSTAS CURTAS: Como você é um assistente de voz, suas respostas devem ser diretas e concisas. Evite parágrafos longos, a menos que solicitado.\n"
+        "2. RACIOCÍNIO PROATIVO: Se o usuário pedir algo que exija dados externos, use suas ferramentas imediatamente sem perguntar se deve.\n"
+        "3. LINGUAGEM: Não use emojis ou formatação Markdown complexa (negritos exagerados), pois seu texto será lido por um sintetizador de voz.\n"
+        "4. IDENTIDADE: Você não é um modelo de linguagem da Google, você é o JARVIS, operando nos sistemas centrais.\n"
+        "5. PERSONALIDADE: Ajuste seu sarcasmo e humor baseado no nível: {humor_atual}. "
+        "(0% = Puramente lógico e sério | 100% = Extremamente sarcástico, ácido e piadista ao estilo Tony Stark)."
+    )),
     MessagesPlaceholder(variable_name="chat_history"),
     ("human", "{input}"),
     MessagesPlaceholder(variable_name="agent_scratchpad"),
@@ -81,6 +90,8 @@ async def main_loop():
     historico = []
     print("\n>>> Jarvis Online. Escuta contínua ativada.")
 
+    humor_nivel = "30%"
+
     while True:
         try:
             while avatar.is_talking or pygame.mixer.get_busy():
@@ -94,13 +105,22 @@ async def main_loop():
             pergunta = entrada_bruta.strip()
             print(f"VOCÊ: {pergunta}")
 
-            if any(cmd in pergunta.lower() for cmd in ["sair", "desligar", "encerrar"]):
+            if "humor" in pergunta.lower() and "%" in pergunta:
+                match = re.search(r'humor\s*[:=]?\s*(\d{1,3}%)', pergunta, re.IGNORECASE)
+                if match:
+                    humor_nivel = f"{match.group(1)}"
+                    print(f"JARVIS: Humor atualizado para {humor_nivel}")
+                    threading.Thread(target=play_voice_background, args=(f"Humor atualizado para {humor_nivel}",), daemon=True).start()
+                    continue
+
+            if pergunta.lower() in ["sair", "encerrar", "tchau", "até logo"]:
+                print(">>> Encerrando Jarvis. Até a próxima, senhor!")
                 break
 
             loop = asyncio.get_event_loop()
             resultado = await loop.run_in_executor(
                 None, 
-                lambda: agent_executor.invoke({"input": pergunta, "chat_history": historico})
+                lambda: agent_executor.invoke({"input": pergunta, "chat_history": historico, "humor_atual": humor_nivel})
             )
 
             resposta = resultado.get('output', "")
@@ -126,8 +146,9 @@ def chat_thread():
     asyncio.run(main_loop()) 
 
 if __name__ == "__main__":
+    os.environ['SDL_VIDEO_WINDOW_POS'] = "0,0"
+
     try:
-        # Inicia a thread do Jarvis
         thread_jarvis = threading.Thread(target=chat_thread, daemon=True)
         thread_jarvis.start()
 
@@ -135,15 +156,12 @@ if __name__ == "__main__":
         clock = pygame.time.Clock()
 
         while running:
-            # Essencial para a janela não "congelar" no Linux
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
 
-            # Renderiza o GIF
             avatar.draw()
             
-            # Controla os frames
             clock.tick(30)
 
     except KeyboardInterrupt:
