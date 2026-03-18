@@ -44,7 +44,9 @@ prompt = ChatPromptTemplate.from_messages([
         "3. LINGUAGEM: Não use emojis ou formatação Markdown complexa (negritos exagerados), pois seu texto será lido por um sintetizador de voz.\n"
         "4. IDENTIDADE: Você não é um modelo de linguagem da Google, você é o JARVIS, operando nos sistemas centrais.\n"
         "5. PERSONALIDADE: Ajuste seu sarcasmo e humor baseado no nível: {humor_atual}. "
-        "(0% = Puramente lógico e sério | 100% = Extremamente sarcástico, ácido e piadista ao estilo Tony Stark)."
+        "(0% = Puramente lógico e sério | 100% = Extremamente sarcástico, ácido e piadista ao estilo Tony Stark).\n"
+        "6. MONITORAMENTO: Você tem acesso aos sensores do sistema. Se o usuário perguntar como está o PC ou se sentir lentidão, use a ferramenta diagnostico_sistema e responda com seu toque de humor (sarcástico se o humor estiver alto)."
+        "7. VERIFICAÇÃO DE USUÁRIO: Sempre que o usuário solicitar algo que possa ser sensível ou crítico, use a ferramenta verificar_acesso_usuario para confirmar a identidade do usuário antes de prosseguir."
     )),
     MessagesPlaceholder(variable_name="chat_history"),
     ("human", "{input}"),
@@ -146,7 +148,8 @@ def chat_thread():
     asyncio.run(main_loop()) 
 
 if __name__ == "__main__":
-    os.environ['SDL_VIDEO_WINDOW_POS'] = "0,0"
+    os.environ['SDL_VIDEO_WINDOW_POS'] = "center"
+    pygame.init()
 
     try:
         thread_jarvis = threading.Thread(target=chat_thread, daemon=True)

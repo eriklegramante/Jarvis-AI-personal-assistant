@@ -3,6 +3,8 @@ from datetime import datetime
 import os
 import shutil
 import platform
+import subprocess
+import psutil
 
 class SystemManager:
     def __init__(self, username="Senhor"):
@@ -41,7 +43,7 @@ class SystemManager:
 
         @tool
         def verify_user_access(user: str):
-            """Verifica se o usuário é autorizado a usar o Jarvis."""
+            """Verifica se o usuário é autorizado a usar o Jarvis, utilizará codigo de acesso '06' para liberar acesso a funções sensíveis."""
             authorized_users = ["root", "legramante"] 
             if user.lower() in authorized_users:
                 return f"Usuário {user} verificado. Acesso concedido."
@@ -78,6 +80,49 @@ class SystemManager:
             """Desliga o sistema. Use com cautela."""
             os.system("shutdown /s /t 1") 
             return "Iniciando protocolo de desligamento. Até a próxima, senhor!"
+        
+        @tool
+        def move_jarvis(direcao: str):
+            """
+            Move a janela do Jarvis para posições específicas na tela.
+            Argumentos: direcao (str) - 'direita', 'esquerda', 'centro', 'topo' ou 'fundo'.
+            """
+            try:
+                window_id = subprocess.check_output(["xdotool", "search", "--name", "pygame window"]).decode().split()[0]
+                
+                coords = {
+                    "esquerda": "100 100",
+                    "direita": "1200 100",
+                    "centro": "500 300",
+                    "fundo": "500 700"
+                }
+                
+                pos = coords.get(direcao.lower(), "100 100")
+                
+                subprocess.run(["xdotool", "windowmove", window_id] + pos.split())
+                subprocess.run(["xdotool", "windowactivate", window_id])
+                
+                return f"Sistemas realinhados para a {direcao}, senhor."
+            except Exception as e:
+                return "Senhor, não consegui localizar a assinatura da minha janela no servidor X11."
+            
+        @tool
+        def system_diagnostics():
+            """Realiza um diagnóstico rápido do sistema e retorna um resumo."""
+            try:
+                cpu_usage = psutil.cpu_percent(interval=1)
+                ram_usage = psutil.virtual_memory()
+
+                monitor = subprocess.check_output("xrandr --listmonitors", shell=True).decode()
+
+                status = (
+                    f"Senhor, a CPU está operando em {cpu_usage}%. "
+                    f"O uso de memória RAM está em {ram_usage.percent}%. "
+                    f"Detectei a seguinte configuração de exibição:\n{monitor}"
+                )
+                return status
+            except Exception as e:
+                return f"Erro ao realizar diagnóstico do sistema: {str(e)}"
 
         return [
             get_personal_info, 
@@ -87,5 +132,7 @@ class SystemManager:
             list_directory_files, 
             get_system_specs,
             get_current_datetime,
-            turn_off
+            turn_off,
+            move_jarvis,
+            system_diagnostics
         ]
