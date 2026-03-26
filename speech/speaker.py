@@ -3,8 +3,8 @@ import asyncio
 import pygame
 import os
 
-class JarvisSpeaker:
-    def __init__(self, voice="pt-BR-AntonioNeural"):
+class AtlasSpeaker:
+    def __init__(self, voice="pt-BR-FranciscaNeural"):
         self.voice = voice
         self.output_file = "speech/output.mp3"
 

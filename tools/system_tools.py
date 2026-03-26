@@ -19,7 +19,7 @@ class SystemManager:
         
         @tool
         def get_personal_info():
-            """Gera uma saudação personalizada para o dono do Jarvis."""
+            """Gera uma saudação personalizada para o dono da Atlas ."""
             return f"Bem vindo de volta, senhor {self.username}."
         
         @tool
@@ -44,7 +44,7 @@ class SystemManager:
 
         @tool
         def verify_user_access(user: str):
-            """Verifica se o usuário é autorizado a usar o Jarvis, utilizará codigo de acesso '06' para liberar acesso a funções sensíveis."""
+            """Verifica se o usuário é autorizado a usar a Atlas, utilizará codigo de acesso '06' para liberar acesso a funções sensíveis."""
             authorized_users = ["root", "legramante"] 
             if user.lower() in authorized_users:
                 return f"Usuário {user} verificado. Acesso concedido."
@@ -83,9 +83,9 @@ class SystemManager:
             return "Iniciando protocolo de desligamento. Até a próxima, senhor!"
         
         @tool
-        def move_jarvis(direcao: str):
+        def move_atlas(direcao: str):
             """
-            Move a janela do Jarvis para posições específicas na tela.
+            Move a janela da ATLAS para posições específicas na tela.
             Argumentos: direcao (str) - 'direita', 'esquerda', 'centro', 'topo' ou 'fundo'.
             """
             try:
@@ -134,6 +134,6 @@ class SystemManager:
             get_system_specs,
             get_current_datetime,
             turn_off,
-            move_jarvis,
+            move_atlas,
             system_diagnostics,
         ]

@@ -1,7 +1,7 @@
 from langchain_core.tools import tool
-from brain.memory_manager import JarvisBrain
+from brain.memory_manager import AtlasBrain
 
-brain = JarvisBrain()
+brain = AtlasBrain()
 
 class MemoryManager:
     def fetch_tools(self):

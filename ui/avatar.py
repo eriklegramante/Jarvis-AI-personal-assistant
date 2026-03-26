@@ -2,7 +2,7 @@ import pygame
 import os
 from PIL import Image 
 
-class JarvisAvatar:
+class AtlasAvatar:
     def __init__(self, gif_path="ui/assets/scifiui2.gif"):
         self.screen = pygame.display.set_mode((800, 800), pygame.NOFRAME | pygame.SRCALPHA | pygame.DOUBLEBUF)
         self.screen.set_colorkey((0, 0, 0)) 
@@ -61,5 +61,5 @@ class JarvisAvatar:
             pygame.display.flip()
 
     def set_talking(self, state: bool):
-        """Altera o estado para quando o Jarvis estiver falando."""
+        """Altera o estado para quando a Atlas estiver falando."""
         self.is_talking = state

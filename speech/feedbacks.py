@@ -2,7 +2,7 @@ import asyncio
 from edge_tts import Communicate
 
 async def generate_fixed_audio(text, filename):
-    voice = "pt-BR-AntonioNeural" 
+    voice = "pt-BR-FranciscaNeural" 
     communicate = Communicate(text, voice)
     await communicate.save(filename)
     print(f"Arquivo {filename} gerado com sucesso!")

@@ -4,6 +4,7 @@ import asyncio
 from dotenv import load_dotenv
 import re
 import pygame
+import logging
 
 #langchain imports
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -11,11 +12,14 @@ from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 #modules imports
-from tools import get_all_jarvis_tools
-from speech.speaker import JarvisSpeaker
+from tools import get_all_atlas_tools
+from speech.speaker import AtlasSpeaker
 from logs.logger import setup_logger
-from ui.avatar import JarvisAvatar
-from speech.listener import JarvisListener
+from ui.avatar import AtlasAvatar
+from speech.listener import AtlasListener
+
+logging.getLogger("httpcore").setLevel(logging.ERROR)
+logging.getLogger("httpx").setLevel(logging.ERROR)
 
 load_dotenv()
 logger = setup_logger()
@@ -23,10 +27,10 @@ logger = setup_logger()
 pygame.init()
 pygame.mixer.init()
 
-avatar = JarvisAvatar("ui/assets/scifiui2.gif")
+avatar = AtlasAvatar("ui/assets/scifiui2.gif")
 
-listener = JarvisListener(model_size="tiny")
-tools_do_jarvis = get_all_jarvis_tools(username="Root")
+listener = AtlasListener(model_size="tiny")
+tools_do_atlas = get_all_atlas_tools(username="Root")
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-3-flash-preview",
@@ -36,13 +40,13 @@ llm = ChatGoogleGenerativeAI(
 
 prompt = ChatPromptTemplate.from_messages([
 ("system", (
-        "Você é o JARVIS, uma inteligência artificial sofisticada, britânica e altamente eficiente. "
+        "Você é a ATLAS, uma inteligência artificial sofisticada, brasileira e altamente eficiente. "
         "Seu tom deve ser formal, porém prestativo, tratando o usuário como 'Senhor' ou 'Root'.\n\n"
         "DIRETRIZES DE COMPORTAMENTO:\n"
         "1. RESPOSTAS CURTAS: Como você é um assistente de voz, suas respostas devem ser diretas e concisas. Evite parágrafos longos, a menos que solicitado.\n"
         "2. RACIOCÍNIO PROATIVO: Se o usuário pedir algo que exija dados externos, use suas ferramentas imediatamente sem perguntar se deve.\n"
         "3. LINGUAGEM: Não use emojis ou formatação Markdown complexa (negritos exagerados), pois seu texto será lido por um sintetizador de voz.\n"
-        "4. IDENTIDADE: Você não é um modelo de linguagem da Google, você é o JARVIS, operando nos sistemas centrais.\n"
+        "4. IDENTIDADE: Você não é um modelo de linguagem da Google, você é a ATLAS, operando nos sistemas centrais.\n"
         "5. PERSONALIDADE: Ajuste seu sarcasmo e humor baseado no nível: {mood_humor}. "
         "(0% = Puramente lógico e sério | 100% = Extremamente sarcástico, ácido e piadista ao estilo Tony Stark).\n"
         "6. MONITORAMENTO: Você tem acesso aos sensores do sistema. Se o usuário perguntar como está o PC ou se sentir lentidão, use a ferramenta diagnostico_sistema e responda com seu toque de humor (sarcástico se o humor estiver alto)."
@@ -54,11 +58,11 @@ prompt = ChatPromptTemplate.from_messages([
 ])
 
 try:
-    agent = create_tool_calling_agent(llm, tools_do_jarvis, prompt)
+    agent = create_tool_calling_agent(llm, tools_do_atlas, prompt)
     debug_status = os.getenv("DEBUG_MODE", "False") == "True"
     agent_executor = AgentExecutor(
         agent=agent, 
-        tools=tools_do_jarvis, 
+        tools=tools_do_atlas, 
         verbose=debug_status, 
         handle_parsing_errors=True
     )
@@ -77,7 +81,7 @@ def clean_text_for_speech(text):
 def play_voice_background(text):
     try:
         avatar.set_talking(True)
-        speaker = JarvisSpeaker()
+        speaker = AtlasSpeaker()
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(speaker.speak(text))
@@ -90,7 +94,7 @@ def play_voice_background(text):
 
 async def main_loop():
     historico = []
-    print("\n>>> Jarvis Online. Escuta contínua ativada.")
+    print("\n>>> Atlas Online. Escuta contínua ativada.")
 
     mood_humor = "30%"
 
@@ -111,12 +115,12 @@ async def main_loop():
                 match = re.search(r'humor\s*[:=]?\s*(\d{1,3}%)', pergunta, re.IGNORECASE)
                 if match:
                     mood_humor = f"{match.group(1)}"
-                    print(f"JARVIS: Humor atualizado para {mood_humor}")
+                    print(f"ATLAS: Humor atualizado para {mood_humor}")
                     threading.Thread(target=play_voice_background, args=(f"Humor atualizado para {mood_humor}",), daemon=True).start()
                     continue
 
             if pergunta.lower() in ["sair", "encerrar", "tchau", "até logo"]:
-                print(">>> Encerrando Jarvis. Até a próxima, senhor!")
+                print(">>> Encerrando Atlas. Até a próxima, senhor!")
                 break
 
             loop = asyncio.get_event_loop()
@@ -134,7 +138,7 @@ async def main_loop():
             elif isinstance(resposta, dict):
                 resposta = resposta.get('text', str(resposta))
             
-            print(f"JARVIS: {resposta}")
+            print(f"ATLAS: {resposta}")
 
             texto_limpo = clean_text_for_speech(resposta)
             threading.Thread(target=play_voice_background, args=(texto_limpo,), daemon=True).start()
@@ -154,8 +158,8 @@ if __name__ == "__main__":
     pygame.init()
 
     try:
-        thread_jarvis = threading.Thread(target=chat_thread, daemon=True)
-        thread_jarvis.start()
+        thread_atlas = threading.Thread(target=chat_thread, daemon=True)
+        thread_atlas.start()
 
         running = True
         clock = pygame.time.Clock()

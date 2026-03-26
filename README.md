@@ -1,4 +1,4 @@
-# 🤖 JARVIS - AI Personal Assistant
+# 🤖 Atlas - AI Personal Assistant
 
 Projeto de desenvolvimento de um assistente virtual inteligente baseado em **Agentes de IA** e **Workflows Agentic**, focado em automação de tarefas, integração com o sistema operacional e busca de informações em tempo real.
 

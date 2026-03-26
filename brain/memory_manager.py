@@ -1,6 +1,6 @@
 import sqlite3
 
-class JarvisBrain:
+class AtlasBrain:
     def __init__(self, db_path="memory_store.db"):
         self.db_path = db_path
         self._initialize_db()

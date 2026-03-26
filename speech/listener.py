@@ -4,7 +4,7 @@ from faster_whisper import WhisperModel
 import faster_whisper
 import torch
 
-class JarvisListener:
+class AtlasListener:
     def __init__(self, model_size="base"):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = WhisperModel(model_size, device=self.device, compute_type="int8")
@@ -33,7 +33,7 @@ class JarvisListener:
                 audio_data, 
                 beam_size=5, 
                 language="pt",
-                initial_prompt="O usuário está falando com o JARVIS, um assistente inteligente. Comandos comuns: sistemas, luzes, pesquisa, Root.",
+                initial_prompt="O usuário está falando com a ATLAS, um assistente inteligente. Comandos comuns: sistemas, luzes, pesquisa, Root.",
                 vad_filter=True,
                 vad_parameters=dict(min_silence_duration_ms=500),
                 condition_on_previous_text=False, 
